@@ -3,7 +3,7 @@ import React,{useState, useEffect} from 'react';
 import Recipe from './Recipe';
 
 import { connect, useDispatch } from 'react-redux';
-import { getRecipes } from './redux/actions'
+import { getRecipes, listCalories, sortCalories } from './redux/reducers/recipeReducer/actions';
 
 function App(props) {
   
@@ -27,6 +27,16 @@ function App(props) {
     console.log(query);
   }
 
+  const listByCalories = cal => {
+    dispatch(listCalories(cal));
+    console.log(props.result)
+  }
+
+  const sortByCalories = greating => {
+    dispatch(sortCalories(greating));
+    console.log(props.result)
+  }
+
   // const getRecipes = () =>{
   //   // const response = await fetch(`https://api.edamam.com/search?q=${query}&app_id=${APP_ID}&app_key=${APP_KEY}`);
   //   // const data = await response.json();
@@ -45,7 +55,14 @@ function App(props) {
         <input className="search-bar" type="text" value={search} onChange={updateSearch}></input>
         <button className="search-btn" type="submit" >Search </button>
       </form>
-      {props.recipes.hits.map(recipe => (
+      <button className="list-cal" type="submit" onClick={() => listByCalories(1000)}>Calories lower 1000  </button>
+      <button className="list-cal" type="submit" onClick={() => listByCalories(2000)}>Calories lower 2000  </button>
+      <button className="list-cal" type="submit" onClick={() => sortByCalories(1)}>Sort By Greating Calories </button>
+      <button className="list-cal" type="submit" onClick={() => sortByCalories(-1)}>Sort By Lowering Calories </button>
+
+
+      {console.log(props.result)}
+      {props.loading ? <h1>Wait For Recipes...</h1>:props.result.map(recipe => (
         <Recipe key={recipe.recipe.label} title={recipe.recipe.label} calories={recipe.recipe.calories} image={recipe.recipe.image}/>
       ))} 
     </div>
@@ -54,10 +71,11 @@ function App(props) {
 
 const mapStateToProps = state => {
   return {
-    recipes: state.recipes,
-    loading: state.loading,
-    error: state.error
+    recipes: state.recipe.recipes,
+    loading: state.recipe.loading,
+    error: state.recipe.error,
+    result: state.recipe.result
   }
 }
 
-export default connect(mapStateToProps, { getRecipes })(App);
+export default connect(mapStateToProps, { getRecipes, listCalories, sortCalories })(App);
